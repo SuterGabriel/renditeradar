@@ -1,23 +1,35 @@
-# Lokale Konfiguration mit echten Werten, bleibt ausserhalb des Repos
+# Umgebungsvariablen
 .env
 .env.*
 !.env.example
-.claude/settings.local.json
 
-# Abhängigkeiten und Build-Artefakte
+# Node
 node_modules/
 .next/
 out/
-.vercel/
+*.tsbuildinfo
+next-env.d.ts
+
+# Python
 __pycache__/
+*.pyc
 .venv/
 .ruff_cache/
 
-# Betriebssystem und Editor
+# Vercel
+.vercel
+
+# Supabase lokal
+supabase/.temp/
+
+# Editor und System
 .DS_Store
 Thumbs.db
-.vscode/
 .idea/
+.vscode/
+
+# Lokale Claude-Code-Einstellungen
+.claude/settings.local.json
 
 # Tailwind-Dokumentationssnapshot des Skills tailwind-4-docs, lizenzbedingt nur lokal
 .claude/skills/tailwind-4-docs/references/docs/

@@ -1,0 +1,9 @@
+# Einheitliche Zeilenenden im Repo, unabhängig vom Betriebssystem
+* text=auto eol=lf
+
+# Binärdateien nie umwandeln
+*.png binary
+*.jpg binary
+*.ico binary
+*.pdf binary
+*.woff2 binary
