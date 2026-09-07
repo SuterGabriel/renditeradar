@@ -1,0 +1,24 @@
+# Lokale Konfiguration mit echten Werten, bleibt ausserhalb des Repos
+.env
+.env.*
+!.env.example
+.claude/settings.local.json
+
+# Abhängigkeiten und Build-Artefakte
+node_modules/
+.next/
+out/
+.vercel/
+__pycache__/
+.venv/
+.ruff_cache/
+
+# Betriebssystem und Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Tailwind-Dokumentationssnapshot des Skills tailwind-4-docs, lizenzbedingt nur lokal
+.claude/skills/tailwind-4-docs/references/docs/
+.claude/skills/tailwind-4-docs/references/docs-index.tsx
