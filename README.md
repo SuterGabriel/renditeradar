@@ -1,2 +1,1 @@
-# renditeradar
-Aggregator für Renditeobjekte: strukturierte Inserate, berechnete Kennzahlen, Umkreissuche. Next.js, Python, PostGIS.
+renditeradar liest Immobiliendaten ein, bereinigt sie, berechnet Rendite- und Preiskennzahlen und stellt sie als durchsuchbare, statisch generierte Seiten bereit. Arbeitsprobe zu Next.js mit ISR und zu räumlichen Abfragen in Postgres, kein produktives Portal.
