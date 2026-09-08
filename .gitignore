@@ -34,3 +34,6 @@ Thumbs.db
 # Tailwind-Dokumentationssnapshot des Skills tailwind-4-docs, lizenzbedingt nur lokal
 .claude/skills/tailwind-4-docs/references/docs/
 .claude/skills/tailwind-4-docs/references/docs-index.tsx
+
+# Ausgabe des Trockenlaufs der Pipeline
+pipeline/objekte.json
