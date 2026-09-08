@@ -1,0 +1,26 @@
+[project]
+name = "renditeradar-pipeline"
+version = "0.1.0"
+description = "Erzeugt, normalisiert und speichert Renditeobjekte mit Kennzahlen"
+requires-python = ">=3.13"
+dependencies = [
+  "psycopg[binary]>=3.2",
+  "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "ANN", "D"]
+ignore = ["D203", "D213", "D413"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D", "ANN"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
