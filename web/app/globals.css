@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+/*
+ * Design-Token aus dem Komponenten-Artboard in docs/mockups/02-ui-mockups.pdf.
+ * Die Werte stehen nur hier, nirgends als Hex-Wert im Markup.
+ * Kein Dunkelmodus, so entschieden im Mockup.
+ */
+@theme {
+  --color-flaeche: #f5f4f1;
+  --color-karte: #ffffff;
+  --color-platzhalter: #eceae5;
+  --color-deaktiviert-flaeche: #f0efec;
+  --color-hairline: #e3e1dc;
+  --color-feldrand: #d9d6d0;
+
+  --color-text: #23272b;
+  --color-text-sekundaer: #5c636b;
+  --color-text-deaktiviert: #9a9fa5;
+
+  --color-akzent: #146c6b;
+  --color-akzent-tint: #edf4f4;
+
+  --color-positiv: #2e7d4f;
+  --color-negativ: #b3382e;
+
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+
+  /* Schriftgrössen aus dem Mockup, Zeilenhöhe 1.2 bei Kennzahlen und Titeln */
+  --text-kennzahl: 1.75rem;
+  --text-kennzahl--line-height: 1.2;
+  --text-kennzahl-mobil: 1.5rem;
+  --text-kennzahl-mobil--line-height: 1.2;
+  --text-seitentitel: 1.5rem;
+  --text-seitentitel--line-height: 1.2;
+  --text-preis: 1.25rem;
+  --text-preis--line-height: 1.2;
+  --text-abschnitt: 1.125rem;
+  --text-abschnitt--line-height: 1.3;
+
+  --radius-kante: 6px;
+}
+
+/*
+ * Tabellenziffern für alle Zahlen, damit Spalten in Karten und Kacheln
+ * bündig stehen. Ohne das springen Preise beim Vergleichen.
+ */
+:root {
+  font-variant-numeric: tabular-nums;
+}
+
+body {
+  background-color: var(--color-flaeche);
+  color: var(--color-text);
+}
+
+/* Sichtbarer Fokusring in der Akzentfarbe, Vorgabe aus dem Mockup */
+:focus-visible {
+  outline: 2px solid var(--color-akzent);
+  outline-offset: 2px;
+}
