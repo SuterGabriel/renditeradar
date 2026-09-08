@@ -73,10 +73,38 @@ Dabei fiel ein weiterer Fehler auf: die Maskierung der spitzen Klammer in den st
 
 Fünfzehn Prüfungen gegen die gerenderte Seite bestehen, darunter genau eine h1 je Seite, Titel je Seite verschieden, kanonische Adresse, Open Graph, zwei JSON-LD-Blöcke, beschriftete Eingabefelder und Ergebnisse in einer Live-Region.
 
+**Deployment** auf Vercel, Root-Verzeichnis `web`, erreichbar unter https://renditeradar-wine.vercel.app
+
+Geprüft gegen die laufende Seite:
+
+| Prüfung | Ergebnis |
+|---|---|
+| Liste, gefilterte Liste, Umkreis, Leerzustand, Sitemap, robots | HTTP 200 |
+| Unbekannter Slug | HTTP 404 |
+| Trefferzahlen gegen die Datenbank | 400, 66, 48, 0, alle gleich |
+| Detailseite | `X-Vercel-Cache: PRERENDER` |
+| Sitemap | 401 Einträge |
+| Kanonische Adresse, Sitemap, robots | zeigen auf die tatsächliche Adresse |
+
+**Lighthouse**, Desktop, gegen die laufende Seite:
+
+| Seite | Leistung | Zugänglichkeit | Best Practices | SEO |
+|---|---|---|---|---|
+| Detailseite | 100 | 100 | 100 | 100 |
+| Liste | 97 | 100 | 100 | 100 |
+
+Bei beiden Seiten: Largest Contentful Paint unter 0.6 s, Cumulative Layout Shift 0, Total Blocking Time 0 ms.
+
+Zwei Befunde aus dem ersten Lauf, beide behoben:
+
+1. **Ein Absatz stand als direktes Kind in einer Definitionsliste.** Erlaubt sind dort nur `dt`, `dd` und `div`. Hilfstechnik kann die Liste sonst falsch vorlesen. Der Absatz steht jetzt davor, die Live-Region bleibt auf der Liste.
+2. **Es fehlte ein Seitensymbol.** Jeder Seitenaufruf erzeugte dadurch einen Fehler in der Browser-Konsole. Behoben mit einem SVG unter `app/icon.svg`.
+
 Offen nach M4:
 
-- **Das Deployment auf Vercel fehlt.** Es braucht den Import des Repositories über das Konto des Betreibers, Root-Verzeichnis `web`, und drei Umgebungsvariablen. Danach: Demo-Adresse ins README, Lighthouse messen, Adresse von einem fremden Gerät prüfen.
-- Lighthouse ist noch nicht gemessen, das setzt die laufende Seite voraus.
+- **Die Listenseite verhindert die Wiederherstellung aus dem Vor- und Zurück-Zwischenspeicher des Browsers.** Das ist der einzige verbleibende Lighthouse-Befund und folgt aus dem Entwurf: die Seite liest ihren Zustand aus den Suchparametern und wird deshalb bei jedem Aufruf gerendert, mit `no-store` als Antwort. Der Zurück-Knopf funktioniert, die Seite wird nur neu geholt statt aus dem Zwischenspeicher genommen. Ein Wechsel auf statische Erzeugung wäre nur möglich, wenn der Filterzustand nicht mehr in der Adresse stünde, und das ist ausdrücklich gewollt.
+- Die Adresse ist eine Vercel-Unteradresse. Der kurze Name war vergeben, deshalb der Zusatz. Eine eigene Domain würde nur `NEXT_PUBLIC_SITE_URL` brauchen.
+- Von einem fremden Gerät ist die Seite noch nicht geöffnet worden. Die Prüfungen liefen über das offene Netz, also von aussen, aber nicht von einem anderen Gerät des Betreibers.
 
 ### M3 Renditerechner, 2026-09-08
 
