@@ -40,7 +40,7 @@ Reihenfolge einhalten. Bei einem Treffer wird nicht committet.
 
 1. Nur benannte Dateien stagen. Kein `git add -A` und kein `git add .`. Grund: ein einziger fehlender Ignore-Eintrag hat in M0 236 fremde Dateien ins Repo gebracht.
 2. `git diff --cached --name-only` lesen. Keine `.env`, keine lokalen Einstellungen, keine Dateien, die nicht zum Commit gehören.
-3. `git diff --cached` nach Secrets durchsuchen: JWT-Anfänge (`eyJ`), Supabase-Tokens (`sbp_`), Stripe-Schlüssel (`sk_`), Verbindungszeichenfolgen mit Passwort, Zugriffstoken mit Wert.
+3. `git diff --cached` nach Secrets durchsuchen: JWT, Supabase-Tokens (`sbp_`), Stripe-Schlüssel (`sk_`), Verbindungszeichenfolgen mit Passwort, Zugriffstoken mit Wert. Ein JWT muss am Muster drei durch Punkte getrennte Teile haben, sonst schlägt die Prüfung auch bei Prüfsummen in `package-lock.json` an. Das genaue Muster steht im Skill `veroeffentlichung`.
 4. `git diff --cached` in `.md`, `.py`, `.ts`, `.tsx`, `.sql` nach Gedankenstrichen und ß durchsuchen.
 5. Bei Änderungen unter `web/`: `tsc --noEmit`, ESLint und Prettier ohne Befund.
 6. Bei Änderungen unter `pipeline/`: `ruff check` und `ruff format --check` ohne Befund.

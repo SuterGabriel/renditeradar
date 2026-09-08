@@ -14,7 +14,7 @@ Alle Befehle vom Repo-Stamm aus. Jeder Befehl muss leer oder ohne Fehler zurück
 ### Secrets in der Historie
 
 ```
-git log -p --all | grep -E "eyJ[A-Za-z0-9_-]{20,}|sbp_[A-Za-z0-9]{20,}|sk_(live|test)_|postgresql://[^:<]+:[^@<]+@"
+git log -p --all | grep -E "eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}|sbp_[A-Za-z0-9]{20,}|sk_(live|test)_|postgresql://[^:<]+:[^@<]+@"
 ```
 
 Bei einem Treffer: nicht pushen. Historie mit `git filter-repo` bereinigen, Schlüssel im Anbieter-Dashboard rotieren, danach erneut prüfen.

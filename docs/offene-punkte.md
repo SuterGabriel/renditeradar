@@ -10,6 +10,61 @@ Was fehlt, was bewusst weggelassen wurde und was beim Abschluss eines Meilenstei
 
 ## Meilensteine
 
+### M2 Next.js Kern, 2026-09-08
+
+Fertig-Kriterium erfüllt. `next build` erzeugt 400 statische Detailseiten:
+
+```
+┌ ƒ /                                    dynamisch, liest searchParams
+├ ○ /_not-found
+├   /objekt/[slug]                       1h Gültigkeit, 1y bis Verfall
+│ └ ● [400 Pfade]
+├ ○ /robots.txt
+└ ○ /sitemap.xml                         1h
+```
+
+Eine gefilterte Adresse lässt sich teilen und öffnet mit denselben Filtern. Die
+Trefferzahlen der Seite stimmen mit der Datenbank überein:
+
+| Adresse | Seite | Datenbank |
+|---|---|---|
+| ohne Filter | 400 | 400 |
+| `?kanton=SO` | 66 | 66 |
+| `?kanton=SO&typ=Wohnung` | 42 | 42 |
+| `?kanton=SO&typ=Wohnung&rendite=4.0` | 33 | 33 |
+| `?rendite=8` | 0 | 0 |
+
+Weitere Prüfungen gegen den Produktionsserver:
+
+| Prüfung | Ergebnis |
+|---|---|
+| Detailseite aus dem Cache | `x-nextjs-cache: HIT`, `x-nextjs-prerender: 1` |
+| Gültigkeit der Detailseite | `Cache-Control: s-maxage=3600, stale-while-revalidate` |
+| Listenseite | `no-store`, wird bei jedem Aufruf gerendert |
+| Strukturierte Daten | `Accommodation`, `Offer`, `PostalAddress`, `GeoCoordinates` |
+| Kanonische Adresse und Titel je Objekt | vorhanden |
+| Sitemap | 401 Einträge, Startseite und 400 Objekte |
+| Unbekannter Slug | HTTP 404 |
+| Seite 2 mit Filter | "Seite 2 von 6", Filter bleiben in der Adresse |
+| Ungültiger Kanton in der Adresse | wird verworfen, keine Fehlermeldung |
+| ESLint, Prettier, `tsc --noEmit` | ohne Befund |
+| Vitest | 22 Tests grün |
+
+Zwei Fehler, die erst die Tests gezeigt haben:
+
+1. **Negative Zahlen in der Adresse kippten das Vorzeichen.** Die Auswertung entfernte alle Zeichen ausser Ziffern und Punkt. Aus `?preis_von=-5000` wurde damit die Zahl 5000, also das Gegenteil des Gemeinten. Jetzt wird der Wert streng geprüft und bei jedem anderen Zeichen verworfen.
+2. **Ein geschütztes Leerzeichen sah aus wie ein normales.** Die Formatierung setzt vor `%` und `m²` ein geschütztes Leerzeichen, damit die Einheit nicht umbricht. Der Test erwartete ein normales und schlug mit zwei scheinbar gleichen Werten fehl. Im Test steht das Zeichen jetzt als Escape, damit der Unterschied lesbar ist.
+
+
+Offen nach M2:
+
+- Der Renditerechner fehlt, er kommt in M3 als einzige Client Component.
+- Der Typ der Tabelle in `web/lib/typen.ts` ist von Hand geschrieben. `supabase gen types typescript` braucht Docker oder ein persönliches Zugriffstoken, beides ist im Setup nicht vorausgesetzt. Bei einer Schemaänderung muss die Datei mitgeändert werden.
+- `generateStaticParams` und die Sitemap lesen höchstens 1000 Zeilen, weil die REST-Schnittstelle nicht mehr auf einmal liefert. Ab mehr Objekten muss dort seitenweise gelesen werden.
+- Ein Formular mit GET-Methode hängt auch leere Felder an die Adresse. Ohne JavaScript entsteht dadurch für dieselbe Ansicht eine längere Adresse. Die Filterlogik verwirft leere Werte, die kanonische Adresse bleibt sauber.
+- Keine Tests für die Komponenten. Getestet ist nur die Logik in `web/lib/`, 22 Tests mit Vitest. Die Darstellung wurde gegen den laufenden Server geprüft, nicht automatisiert.
+- `@types/node` musste von Version 20 auf 24 gehoben werden, weil Vitest neuere Typen verlangt. Version 24 entspricht der tatsächlich verwendeten Node-Laufzeit, die Vorlage von create-next-app war veraltet.
+
 ### M1 Datenpipeline, 2026-09-08
 
 Fertig-Kriterium erfüllt. Zwei Läufe von `python main.py` hintereinander:
