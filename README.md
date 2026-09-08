@@ -6,7 +6,7 @@ Aggregator für Renditeobjekte: strukturierte Inserate, berechnete Kennzahlen, i
 [![web](https://github.com/SuterGabriel/renditeradar/actions/workflows/web.yml/badge.svg)](https://github.com/SuterGabriel/renditeradar/actions/workflows/web.yml)
 [![qualitaet](https://github.com/SuterGabriel/renditeradar/actions/workflows/qualitaet.yml/badge.svg)](https://github.com/SuterGabriel/renditeradar/actions/workflows/qualitaet.yml)
 
-**Demo:** wird nach dem Deployment eingetragen
+**Demo:** https://renditeradar-wine.vercel.app
 
 ## Was es tut
 
@@ -50,7 +50,7 @@ Ausführlich in [docs/architektur.md](docs/architektur.md) und [docs/datenmodell
 | Gestaltung | Tailwind 4, mobile-first | Design-Token aus dem Mockup, keine Hex-Werte im Markup |
 | Datenbank | PostgreSQL auf Supabase | Zusammengesetzte Indizes und PostGIS, siehe Entscheid 002 |
 | Pipeline | Python 3.13, psycopg, ruff | Eine Aufgabe pro Datei, Typannotationen, Tests |
-| Tests | pytest und Vitest | 15 plus 31 Tests, nur reine Logik |
+| Tests | pytest und Vitest | 15 plus 36 Tests, nur reine Logik |
 | CI | GitHub Actions, drei Workflows | Erzwingt die Regeln, die sonst an Disziplin hängen |
 
 ## Setup
@@ -104,13 +104,14 @@ Jeder Entscheid nennt die verworfene Alternative und woran sie gescheitert ist.
 ## Was das Projekt zeigt
 
 - **Idempotente Pipeline.** Zweiter Lauf, null neue Zeilen. Nachgewiesen, nicht behauptet, siehe [docs/offene-punkte.md](docs/offene-punkte.md).
-- **Genau eine Client Component.** Filter, Chips und Blättern laufen über URL und Formular und funktionieren ohne JavaScript. Nur der Renditerechner braucht Zustand im Browser.
+- **Zwei Client Components im ganzen Projekt.** Filter, Chips und Blättern laufen über URL und Formular und funktionieren ohne JavaScript. Nur der Renditerechner und die Karte brauchen den Browser.
 - **Statische Detailseiten mit Erneuerung.** Messbar am Antwortkopf, nicht am Gefühl.
-- **Fehler mit Ursache dokumentiert.** Vier Problem-Dokumente in [docs/architektur.md](docs/architektur.md), darunter der Fall, in dem alle Prüfungen lokal grün und in der CI rot waren.
+- **Umkreissuche mit PostGIS.** Zehn Kilometer um Olten, 48 Treffer, gemessene 7.8 ms mit räumlichem Index. Der Abfrageplan steht in [docs/offene-punkte.md](docs/offene-punkte.md).
+- **Fehler mit Ursache dokumentiert.** Fünf Problem-Dokumente in [docs/architektur.md](docs/architektur.md), darunter der Fall, in dem alle Prüfungen lokal grün und in der CI rot waren, und der ungenutzte räumliche Index.
 
 ## Was bewusst fehlt
 
-Auth, Stripe, Benutzerbereich mit Favoriten, Benachrichtigungen und Cron sind nicht Teil dieser Arbeitsprobe. Sie sind in anderen Projekten belegt. Der Umfang ist auf das begrenzt, was hier neu gezeigt werden soll: Next.js mit statischer Erzeugung und SEO sowie Postgres mit Filter- und Standortabfragen.
+Auth, Stripe, Benutzerbereich mit Favoriten, Benachrichtigungen, Cron und Scraping sind nicht Teil dieser Arbeitsprobe. Sie sind in anderen Projekten belegt. Der Umfang ist auf das begrenzt, was hier neu gezeigt werden soll: Next.js mit statischer Erzeugung und SEO sowie Postgres mit Filter- und Standortabfragen.
 
 Was innerhalb dieses Umfangs offen ist, steht vollständig in [docs/offene-punkte.md](docs/offene-punkte.md), einschliesslich der Grenzen der Duplikaterkennung.
 
