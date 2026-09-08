@@ -1,0 +1,43 @@
+# Prüft die Python-Pipeline: Formatierung, Lint und Tests.
+# Läuft nur, wenn sich unter pipeline/ etwas ändert. Die Regeln stammen aus
+# dem Skill code-stil, hier werden sie erzwungen statt nur beschrieben.
+name: pipeline
+
+on:
+  push:
+    branches: [main]
+    paths: ["pipeline/**", ".github/workflows/pipeline.yml"]
+  pull_request:
+    paths: ["pipeline/**", ".github/workflows/pipeline.yml"]
+
+jobs:
+  pruefen:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pipeline
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: pipeline/requirements.txt
+
+      - name: Abhängigkeiten installieren
+        run: pip install -r requirements.txt
+
+      - name: Formatierung prüfen
+        run: ruff format --check .
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Tests
+        run: pytest -q
+
+      - name: Trockenlauf der Pipeline
+        # Erzeugt 400 Objekte ohne Datenbank. Bricht ab, wenn Generator,
+        # Normalisierung oder Duplikaterkennung nicht mehr zusammenpassen.
+        run: python main.py --trocken

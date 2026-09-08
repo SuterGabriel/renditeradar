@@ -24,7 +24,7 @@ Befehl und Ausgabe kommen in `docs/offene-punkte.md` unter den Meilenstein.
 
 ## 2. Lint und Tests
 
-Laufen ohne Befund, siehe Skill `code-stil`.
+Laufen ohne Befund, siehe Skill `code-stil`. Dieselben Prüfungen laufen in `.github/workflows/` bei jedem Push. Der Workflow `qualitaet` prüft ausserdem, dass zu jedem Tag `m<n>` ein Abschnitt `### M<n>` in `docs/offene-punkte.md` steht. Ein Tag ohne Abschnitt macht die CI rot.
 
 ## 3. Dokumentation nachziehen
 

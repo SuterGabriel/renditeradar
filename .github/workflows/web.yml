@@ -1,0 +1,54 @@
+# Prüft die Next.js-Anwendung: Formatierung, Lint, Typen, Tests und Build.
+# Der Build liest beim Erzeugen der statischen Seiten aus Supabase und braucht
+# dafür zwei Repository-Secrets. Fehlen sie, wird der Build übersprungen und
+# als Warnung gemeldet, damit die übrigen Prüfungen trotzdem laufen.
+name: web
+
+on:
+  push:
+    branches: [main]
+    paths: ["web/**", ".github/workflows/web.yml"]
+  pull_request:
+    paths: ["web/**", ".github/workflows/web.yml"]
+
+jobs:
+  pruefen:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      NEXT_PUBLIC_SITE_URL: https://renditeradar.vercel.app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Abhängigkeiten installieren
+        run: npm ci
+
+      - name: Formatierung prüfen
+        run: npx prettier --check "app/**/*.{ts,tsx,css}" "components/**/*.tsx" "lib/**/*.ts" "tests/**/*.ts" next.config.ts vitest.config.ts
+
+      - name: Lint
+        run: npx eslint .
+
+      - name: Typen prüfen
+        run: npx tsc --noEmit
+
+      - name: Tests
+        run: npx vitest run
+
+      - name: Build, wenn Zugangsdaten vorhanden
+        run: |
+          if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ] || [ -z "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]; then
+            echo "::warning::Build übersprungen. Repository-Secrets NEXT_PUBLIC_SUPABASE_URL und NEXT_PUBLIC_SUPABASE_ANON_KEY fehlen."
+            exit 0
+          fi
+          npx next build

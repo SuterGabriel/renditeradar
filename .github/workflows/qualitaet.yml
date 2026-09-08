@@ -1,0 +1,86 @@
+# Prüft das Repo als Ganzes: Secrets in der Historie, Rechtschreibregeln,
+# fremde Inhalte, Portalnamen, Lizenz und die Vollständigkeit der Meilensteine.
+# Das ist Teil A des Skills veroeffentlichung als Maschine statt als Prüfliste.
+name: qualitaet
+
+on:
+  push:
+    branches: [main]
+    tags: ["m*"]
+  pull_request:
+
+jobs:
+  pruefen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Die ganze Historie, weil Secrets auch in alten Commits sichtbar bleiben
+          fetch-depth: 0
+
+      - name: Keine Secrets in der Historie
+        run: |
+          MUSTER='eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}|sbp_[A-Za-z0-9]{20,}|sk_(live|test)_[A-Za-z0-9]{10,}|postgresql://[^:<]+:[^@<]+@'
+          if git log -p --all | grep -E "$MUSTER"; then
+            echo "::error::Ein Secret steht in der Historie. Schlüssel rotieren und Historie bereinigen."
+            exit 1
+          fi
+
+      - name: Keine .env eingecheckt
+        run: |
+          if git log --all --name-only --pretty=format: | grep -E '^\.env$|^\.env\.local$|/\.env$'; then
+            echo "::error::Eine .env wurde eingecheckt."
+            exit 1
+          fi
+
+      - name: .env.example enthält nur Platzhalter
+        run: |
+          if grep -vE '^#|^$|<[a-z-]+>|localhost' .env.example; then
+            echo "::error::Eine Zeile in .env.example enthält einen echten Wert."
+            exit 1
+          fi
+
+      - name: Keine fremden Inhalte
+        run: |
+          if git log --all --name-only --pretty=format: | grep -E 'tailwind-4-docs/references/(docs/|docs-index)'; then
+            echo "::error::Der Tailwind-Dokumentationssnapshot ist nicht frei lizenziert und darf nicht ins Repo."
+            exit 1
+          fi
+
+      - name: Kein Portalname bei der Datenbeschaffung
+        run: |
+          if git grep -n -i -E 'immoscout|immowelt|homegate|comparis|newhome' -- ':!docs/entscheide' ':!README.md' ':!.claude'; then
+            echo "::error::Ein reales Immobilienportal wird im Code oder in der Doku genannt."
+            exit 1
+          fi
+
+      - name: Kein Scraping-Code
+        run: |
+          if git grep -n -i -E 'playwright|selenium|scrapy|puppeteer|bright ?data' -- ':!docs' ':!README.md' ':!.claude' ':!web/package-lock.json'; then
+            echo "::error::Scraping-Werkzeuge im Code. Das Projekt liest keine Portale aus."
+            exit 1
+          fi
+
+      - name: Schweizer Rechtschreibung, keine Gedankenstriche
+        run: |
+          if git grep -n -E '—|ß' -- 'docs/*.md' 'README.md' 'pipeline/*.py' 'supabase/*.sql' 'web/app' 'web/components' 'web/lib' 'web/tests'; then
+            echo "::error::Gedankenstrich oder ß gefunden. Regeln im Skill projektdoku."
+            exit 1
+          fi
+
+      - name: Lizenz und Haftungsausschluss
+        run: |
+          test -f LICENSE || { echo "::error::LICENSE fehlt."; exit 1; }
+          grep -q Anlageberatung README.md || { echo "::error::Haftungsausschluss im README fehlt."; exit 1; }
+
+      - name: Jeder Meilenstein-Tag hat einen Abschnitt in den offenen Punkten
+        run: |
+          fehlt=0
+          for tag in $(git tag -l 'm*'); do
+            n=${tag#m}
+            if ! grep -q "^### M$n " docs/offene-punkte.md; then
+              echo "::error::Tag $tag gesetzt, aber kein Abschnitt '### M$n' in docs/offene-punkte.md."
+              fehlt=1
+            fi
+          done
+          exit $fehlt

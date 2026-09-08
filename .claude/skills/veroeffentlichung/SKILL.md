@@ -9,6 +9,8 @@ Das Repo ist öffentlich. Was einmal gepusht ist, bleibt in der Historie sichtba
 
 ## Teil A: Vor jedem Push
 
+Dieser Teil läuft seit M2 als GitHub Action in `.github/workflows/qualitaet.yml` bei jedem Push und jedem Tag. Die Befehle hier sind dieselben, für den Lauf vor dem Push. Ein roter Haken auf GitHub heisst: nicht deployen.
+
 Alle Befehle vom Repo-Stamm aus. Jeder Befehl muss leer oder ohne Fehler zurückkommen.
 
 ### Secrets in der Historie
