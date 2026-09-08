@@ -22,9 +22,9 @@ jobs:
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       NEXT_PUBLIC_SITE_URL: https://renditeradar.vercel.app
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
@@ -38,6 +38,11 @@ jobs:
 
       - name: Lint
         run: npx eslint .
+
+      - name: Routentypen erzeugen
+        # PageProps und LayoutProps entstehen erst beim Build. Ohne diesen
+        # Schritt scheitert tsc in einer frischen Umgebung, lokal nie.
+        run: npx next typegen
 
       - name: Typen prüfen
         run: npx tsc --noEmit
