@@ -105,41 +105,40 @@ export function Renditerechner({
         </div>
 
         {/* aria-live, damit Screenreader die neuen Werte nach einer Eingabe vorlesen */}
-        <dl
-          aria-live="polite"
-          className="self-start border-t border-hairline lg:border-t-0 lg:border-l lg:pl-6"
-        >
+        <div className="self-start border-t border-hairline lg:border-t-0 lg:border-l lg:pl-6">
           <p className="pt-3 text-xs text-text-sekundaer lg:pt-0">
             Bei Ihren Annahmen
           </p>
-          <Ergebniszeile
-            bezeichnung="Bruttorendite"
-            wert={anteil(ergebnis.bruttorendite)}
-          />
-          <Ergebniszeile
-            bezeichnung="Nettorendite"
-            wert={anteil(ergebnis.nettorendite)}
-          />
-          <Ergebniszeile
-            bezeichnung="Eigenkapitalrendite"
-            wert={anteil(ergebnis.eigenkapitalrendite)}
-          />
-          <Ergebniszeile
-            bezeichnung="Cashflow pro Monat"
-            wert={
-              ergebnis.cashflowMonatChf === null
-                ? "keine Angabe"
-                : chf(ergebnis.cashflowMonatChf, true)
-            }
-            richtung={
-              ergebnis.cashflowMonatChf === null
-                ? undefined
-                : ergebnis.cashflowMonatChf < 0
-                  ? "negativ"
-                  : "positiv"
-            }
-          />
-        </dl>
+          <dl aria-live="polite">
+            <Ergebniszeile
+              bezeichnung="Bruttorendite"
+              wert={anteil(ergebnis.bruttorendite)}
+            />
+            <Ergebniszeile
+              bezeichnung="Nettorendite"
+              wert={anteil(ergebnis.nettorendite)}
+            />
+            <Ergebniszeile
+              bezeichnung="Eigenkapitalrendite"
+              wert={anteil(ergebnis.eigenkapitalrendite)}
+            />
+            <Ergebniszeile
+              bezeichnung="Cashflow pro Monat"
+              wert={
+                ergebnis.cashflowMonatChf === null
+                  ? "keine Angabe"
+                  : chf(ergebnis.cashflowMonatChf, true)
+              }
+              richtung={
+                ergebnis.cashflowMonatChf === null
+                  ? undefined
+                  : ergebnis.cashflowMonatChf < 0
+                    ? "negativ"
+                    : "positiv"
+              }
+            />
+          </dl>
+        </div>
       </div>
 
       <p className="mt-4 text-xs text-text-sekundaer">
