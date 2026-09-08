@@ -32,6 +32,15 @@ Weitere Messungen aus derselben Datenbank:
 | Lesen über die REST-Schnittstelle mit dem Anon-Key | erfolgreich |
 | Schreiben über die REST-Schnittstelle mit dem Anon-Key | abgewiesen, HTTP 401, Fehlercode 42501 |
 
+Problem und Lösung: Die Migration wurde zunächst direkt über die
+Postgres-Verbindung ausgeführt, statt über die Supabase-CLI. Die Tabelle
+entstand korrekt, aber der Eintrag in `supabase_migrations.schema_migrations`
+fehlte. Ein späteres `supabase db push` wäre daran gescheitert, weil die
+Tabelle bereits existiert. Der Eintrag wurde nachgetragen. Warum es zählt:
+Eine Migration ist erst angewendet, wenn die Datenbank auch weiss, dass sie
+angewendet wurde. Sonst weichen Schema und Buchführung auseinander, und der
+Fehler zeigt sich erst beim nächsten Deployment.
+
 Offen nach M1:
 
 - Der Dedup-Hash fasst PLZ, Strasse und gerundete Fläche zusammen. Zwei verschiedene Wohnungen im selben Haus mit gleicher Fläche gelten damit als dasselbe Objekt. Bei einer echten Quelle bräuchte es die Stockwerkangabe im Hash.
