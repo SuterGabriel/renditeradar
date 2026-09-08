@@ -24,3 +24,5 @@ ignore = ["D203", "D213", "D413"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# Die Tests importieren die Module direkt, deshalb das Verzeichnis in den Suchpfad
+pythonpath = ["."]

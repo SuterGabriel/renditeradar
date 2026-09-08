@@ -49,14 +49,14 @@ jobs:
 
       - name: Kein Portalname bei der Datenbeschaffung
         run: |
-          if git grep -n -i -E 'immoscout|immowelt|homegate|comparis|newhome' -- ':!docs/entscheide' ':!README.md' ':!.claude'; then
+          if git grep -n -i -E 'immoscout|immowelt|homegate|comparis|newhome' -- ':!docs/entscheide' ':!README.md' ':!.claude' ':!.github'; then
             echo "::error::Ein reales Immobilienportal wird im Code oder in der Doku genannt."
             exit 1
           fi
 
       - name: Kein Scraping-Code
         run: |
-          if git grep -n -i -E 'playwright|selenium|scrapy|puppeteer|bright ?data' -- ':!docs' ':!README.md' ':!.claude' ':!web/package-lock.json'; then
+          if git grep -n -i -E 'playwright|selenium|scrapy|puppeteer|bright ?data' -- ':!docs' ':!README.md' ':!.claude' ':!.github' ':!web/package-lock.json'; then
             echo "::error::Scraping-Werkzeuge im Code. Das Projekt liest keine Portale aus."
             exit 1
           fi
