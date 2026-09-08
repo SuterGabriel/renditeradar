@@ -31,9 +31,14 @@ export type SortierSchluessel = keyof typeof SORTIERUNGEN;
 
 const SORTIER_SCHLUESSEL = Object.keys(SORTIERUNGEN) as SortierSchluessel[];
 
+/** Radien, die der Umkreisfilter anbietet, in Kilometern */
+export const UMKREISE = [5, 10, 25, 50] as const;
+
 /** Geprüfter Filterzustand. Ein fehlender Wert bedeutet: nicht gefiltert. */
 export type Filter = {
   kanton: string | null;
+  ort: string | null;
+  umkreisKm: number | null;
   typ: ObjektTyp | null;
   preisVon: number | null;
   preisBis: number | null;
@@ -85,8 +90,19 @@ export function leseFilter(parameter: SuchParameter): Filter {
   const sortierungRoh = einzelwert(parameter.sortierung);
   const seiteRoh = zahl(parameter.seite);
 
+  const ortRoh = einzelwert(parameter.ort);
+  const umkreisRoh = zahl(parameter.umkreis);
+
   return {
     kanton: kantonRoh && /^[A-Z]{2}$/.test(kantonRoh) ? kantonRoh : null,
+    // Der Ortsname wird nicht gegen eine Liste geprüft, sondern erst in der
+    // Abfrage aufgelöst. Ein unbekannter Ort ergibt dort keine Koordinate und
+    // damit kein Ergebnis, statt einen Fehler.
+    ort: ortRoh && ortRoh.length <= 60 ? ortRoh : null,
+    umkreisKm:
+      umkreisRoh && UMKREISE.includes(umkreisRoh as (typeof UMKREISE)[number])
+        ? umkreisRoh
+        : null,
     typ: OBJEKT_TYPEN.includes(typRoh as ObjektTyp)
       ? (typRoh as ObjektTyp)
       : null,
@@ -126,6 +142,9 @@ export function baueZiel(
 
   const query: Record<string, string> = {};
   if (neu.kanton) query.kanton = neu.kanton;
+  if (neu.ort) query.ort = neu.ort;
+  // Ein Umkreis ohne Ort hat keinen Bezugspunkt und wird weggelassen
+  if (neu.ort && neu.umkreisKm !== null) query.umkreis = String(neu.umkreisKm);
   if (neu.typ) query.typ = neu.typ;
   if (neu.preisVon !== null) query.preis_von = String(neu.preisVon);
   if (neu.preisBis !== null) query.preis_bis = String(neu.preisBis);
@@ -140,6 +159,7 @@ export function baueZiel(
 export function zaehleFilter(filter: Filter): number {
   return [
     filter.kanton,
+    filter.ort,
     filter.typ,
     filter.preisVon,
     filter.preisBis,

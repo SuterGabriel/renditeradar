@@ -4,7 +4,7 @@ import Link from "next/link";
 import { FilterChips, FilterLeiste } from "@/components/FilterLeiste";
 import { ObjektKarte } from "@/components/ObjektKarte";
 import { Seitennavigation } from "@/components/Seitennavigation";
-import { holeKantone, holeListe } from "@/lib/abfragen";
+import { holeKantone, holeListe, holeOrte } from "@/lib/abfragen";
 import { leseFilter } from "@/lib/filter";
 import { SEITEN_URL } from "@/lib/seite";
 
@@ -27,18 +27,24 @@ export const metadata: Metadata = {
 
 export default async function Listenseite({ searchParams }: PageProps<"/">) {
   const filter = leseFilter(await searchParams);
-  const [{ objekte, gesamt, seiten }, kantone] = await Promise.all([
+  // Drei Abfragen parallel, nicht nacheinander. Sonst summieren sich die Wege.
+  const [{ objekte, gesamt, seiten }, kantone, orte] = await Promise.all([
     holeListe(filter),
     holeKantone(),
+    holeOrte(),
   ]);
 
   return (
     <div className="flex flex-col gap-4 lg:flex-row lg:gap-8">
       <div className="lg:w-[280px] lg:shrink-0">
-        <FilterLeiste filter={filter} kantone={kantone} />
+        <FilterLeiste filter={filter} kantone={kantone} orte={orte} />
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-4">
+        <h1 className="text-seitentitel font-semibold">
+          Renditeobjekte in der Schweiz
+        </h1>
+
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <p className="font-semibold">
             {gesamt} {gesamt === 1 ? "Objekt" : "Objekte"}

@@ -37,6 +37,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="de-CH" className={`${plexSans.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">
+        {/* Sprungmarke, damit Tastaturnutzer die Kopfzeile überspringen können */}
+        <a href="#inhalt" className="sprungmarke">
+          Zum Inhalt springen
+        </a>
+
         <header className="border-b border-hairline bg-karte">
           <div className="mx-auto max-w-[1200px] px-4 py-4 lg:px-8">
             <Link href="/" className="text-abschnitt font-semibold">
@@ -45,7 +50,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-[1200px] flex-1 px-4 py-6 lg:px-8">
+        <main
+          id="inhalt"
+          className="mx-auto w-full max-w-[1200px] flex-1 px-4 py-6 lg:px-8"
+        >
           {children}
         </main>
 

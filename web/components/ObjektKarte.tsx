@@ -19,7 +19,7 @@ export function ObjektKarte({ objekt }: { objekt: ObjektKarteDaten }) {
       href={`/objekt/${objekt.slug}`}
       className="block rounded-kante border border-hairline bg-karte p-4 transition-colors hover:border-akzent"
     >
-      <h2 className="font-semibold">{objekt.titel}</h2>
+      <h2 className="font-semibold break-words">{objekt.titel}</h2>
       <p className="text-sm text-text-sekundaer">
         {objekt.plz} {objekt.ort}, {objekt.kanton}
       </p>

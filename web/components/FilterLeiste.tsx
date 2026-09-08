@@ -1,8 +1,9 @@
 import Link from "next/link";
 
-import { OBJEKT_TYPEN } from "@/lib/typen";
+import { OBJEKT_TYPEN, type Ort } from "@/lib/typen";
 import {
   SORTIERUNGEN,
+  UMKREISE,
   baueZiel,
   zaehleFilter,
   type Filter,
@@ -21,13 +22,16 @@ import {
  *
  * @param filter aktueller Filterzustand aus der URL
  * @param kantone Kantone, die tatsächlich Objekte haben
+ * @param orte Orte mit Objekten, für den Umkreisfilter
  */
 export function FilterLeiste({
   filter,
   kantone,
+  orte,
 }: {
   filter: Filter;
   kantone: string[];
+  orte: Ort[];
 }) {
   const anzahl = zaehleFilter(filter);
 
@@ -65,6 +69,38 @@ export function FilterLeiste({
           </select>
         </Feld>
 
+        <Feld beschriftung="Ort für die Umkreissuche" fuer="ort">
+          <select
+            id="ort"
+            name="ort"
+            defaultValue={filter.ort ?? ""}
+            className="min-h-11 w-full rounded-kante border border-feldrand bg-karte px-3"
+          >
+            <option value="">Kein Ort gewählt</option>
+            {orte.map((o) => (
+              <option key={`${o.ort}-${o.kanton}`} value={o.ort}>
+                {o.ort} ({o.kanton})
+              </option>
+            ))}
+          </select>
+        </Feld>
+
+        <Feld beschriftung="Umkreis" fuer="umkreis">
+          <select
+            id="umkreis"
+            name="umkreis"
+            defaultValue={filter.umkreisKm ?? ""}
+            className="min-h-11 w-full rounded-kante border border-feldrand bg-karte px-3"
+          >
+            <option value="">Ohne Umkreis</option>
+            {UMKREISE.map((km) => (
+              <option key={km} value={km}>
+                {km} km
+              </option>
+            ))}
+          </select>
+        </Feld>
+
         <Feld beschriftung="Typ" fuer="typ">
           <select
             id="typ"
@@ -90,6 +126,7 @@ export function FilterLeiste({
               type="number"
               name="preis_von"
               inputMode="numeric"
+              autoComplete="off"
               min={0}
               step={10000}
               aria-label="Preis von in CHF"
@@ -101,6 +138,7 @@ export function FilterLeiste({
               type="number"
               name="preis_bis"
               inputMode="numeric"
+              autoComplete="off"
               min={0}
               step={10000}
               aria-label="Preis bis in CHF"
@@ -117,6 +155,7 @@ export function FilterLeiste({
             type="number"
             name="rendite"
             inputMode="decimal"
+            autoComplete="off"
             min={0}
             max={20}
             step={0.1}
@@ -199,6 +238,15 @@ export function FilterChips({ filter }: { filter: Filter }) {
       schluessel: "kanton",
       titel: filter.kanton,
       ohne: { kanton: null },
+    });
+  }
+  if (filter.ort) {
+    chips.push({
+      schluessel: "ort",
+      titel: filter.umkreisKm
+        ? `${filter.umkreisKm} km um ${filter.ort}`
+        : filter.ort,
+      ohne: { ort: null, umkreisKm: null },
     });
   }
   if (filter.typ) {

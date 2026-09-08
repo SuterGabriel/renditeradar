@@ -200,7 +200,7 @@ function Eingabe({
           onChange={(e) => lese(e.target.value)}
           className="min-h-11 flex-1 accent-akzent"
         />
-        <div className="flex min-h-11 w-36 items-center rounded-kante border border-feldrand bg-karte px-3">
+        <div className="flex min-h-11 w-36 items-center rounded-kante border border-feldrand bg-karte px-3 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-akzent">
           <input
             id={`${id}-zahl`}
             type="number"
@@ -209,6 +209,8 @@ function Eingabe({
             step={schritt}
             value={Number.isInteger(wert) ? wert : Number(wert.toFixed(2))}
             onChange={(e) => lese(e.target.value)}
+            autoComplete="off"
+            // Der Fokusring sitzt am Rahmen, siehe focus-within oben
             className="w-full min-w-0 bg-transparent text-right outline-none"
           />
           <span className="pl-2 text-sm text-text-sekundaer">{einheit}</span>

@@ -5,6 +5,8 @@ import { baueZiel, leseFilter, zaehleFilter, type Filter } from "@/lib/filter";
 /** Filter ohne gesetzte Werte, als Ausgangspunkt für die einzelnen Fälle */
 const leer: Filter = {
   kanton: null,
+  ort: null,
+  umkreisKm: null,
   typ: null,
   preisVon: null,
   preisBis: null,
@@ -31,6 +33,8 @@ describe("leseFilter", () => {
       }),
     ).toEqual({
       kanton: "SO",
+      ort: null,
+      umkreisKm: null,
       typ: "Wohnung",
       preisVon: 300000,
       preisBis: 1200000,
@@ -66,6 +70,16 @@ describe("leseFilter", () => {
     expect(leseFilter({ seite: "-2" }).seite).toBe(1);
   });
 
+  it("liest Ort und Umkreis, wenn der Radius angeboten wird", () => {
+    const f = leseFilter({ ort: "Olten", umkreis: "10" });
+    expect(f.ort).toBe("Olten");
+    expect(f.umkreisKm).toBe(10);
+  });
+
+  it("verwirft einen Radius, den es nicht gibt", () => {
+    expect(leseFilter({ ort: "Olten", umkreis: "7" }).umkreisKm).toBeNull();
+  });
+
   it("schneidet eine gebrochene Seitenzahl auf eine ganze ab", () => {
     expect(leseFilter({ seite: "2.7" }).seite).toBe(2);
   });
@@ -99,6 +113,24 @@ describe("baueZiel", () => {
     const ziel = baueZiel(
       { ...leer, kanton: "SO", typ: "Wohnung" },
       { typ: null },
+    );
+    expect(ziel.query).toEqual({ kanton: "SO" });
+  });
+
+  it("lässt einen Umkreis ohne Ort weg, weil ihm der Bezugspunkt fehlt", () => {
+    const ziel = baueZiel({ ...leer, umkreisKm: 10 });
+    expect(ziel.query.umkreis).toBeUndefined();
+  });
+
+  it("setzt Ort und Umkreis gemeinsam", () => {
+    const ziel = baueZiel({ ...leer, ort: "Olten", umkreisKm: 10 });
+    expect(ziel.query).toEqual({ ort: "Olten", umkreis: "10" });
+  });
+
+  it("entfernt mit dem Ort auch den Umkreis", () => {
+    const ziel = baueZiel(
+      { ...leer, ort: "Olten", umkreisKm: 10, kanton: "SO" },
+      { ort: null, umkreisKm: null },
     );
     expect(ziel.query).toEqual({ kanton: "SO" });
   });

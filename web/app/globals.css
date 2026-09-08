@@ -51,6 +51,42 @@
 body {
   background-color: var(--color-flaeche);
   color: var(--color-text);
+  /* Verhindert die Verzögerung durch Doppeltipp-Zoom auf Mobilgeräten */
+  touch-action: manipulation;
+}
+
+/* Verhindert Schusterjungen in Überschriften, ohne feste Umbrüche zu setzen */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+/* Wer Bewegung reduziert haben will, bekommt keine Übergänge */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Sprungmarke zum Inhalt, nur sichtbar wenn sie den Fokus hat */
+.sprungmarke {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 50;
+}
+
+.sprungmarke:focus {
+  left: 0.5rem;
+  top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--color-karte);
+  border: 1px solid var(--color-akzent);
+  border-radius: var(--radius-kante);
 }
 
 /* Sichtbarer Fokusring in der Akzentfarbe, Vorgabe aus dem Mockup */

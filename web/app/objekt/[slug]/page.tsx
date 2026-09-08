@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { KennzahlKachel } from "@/components/KennzahlKachel";
 import { Renditerechner } from "@/components/Renditerechner";
+import { Vergleichsobjekte } from "@/components/Vergleichsobjekte";
 import { holeAlleSlugs, holeObjekt } from "@/lib/abfragen";
 import {
   chf,
@@ -153,6 +154,12 @@ export default async function Detailseite({
         mietertragJahrChf={objekt.mietertrag_jahr_chf}
       />
 
+      <Vergleichsobjekte
+        slug={objekt.slug}
+        mitte={{ lat: Number(objekt.lat), lon: Number(objekt.lon) }}
+        titel={objekt.titel}
+      />
+
       <p className="text-xs text-text-sekundaer">
         Die Kennzahlen dienen der Demonstration und sind keine Anlageberatung.
         Das Objekt ist erfunden, es steht kein reales Inserat dahinter.
@@ -188,7 +195,7 @@ function Eckdatum({
  * QuantitativeValue in Quadratmetern.
  */
 function StrukturierteDaten({ objekt }: { objekt: Objekt }) {
-  const daten = {
+  const objektDaten = {
     "@context": "https://schema.org",
     "@type": "Accommodation",
     name: objekt.titel,
@@ -220,15 +227,38 @@ function StrukturierteDaten({ objekt }: { objekt: Objekt }) {
     },
   };
 
+  // Derselbe Pfad, den die Brotkrumen oben zeigen, noch einmal maschinenlesbar
+  const brotkrumen = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: SEITEN_NAME, item: SEITEN_URL },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: objekt.kanton,
+        item: `${SEITEN_URL}/?kanton=${objekt.kanton}`,
+      },
+      { "@type": "ListItem", position: 3, name: objekt.ort },
+    ],
+  };
+
+  // Zwei getrennte Blöcke statt eines Graphen: jeder ist für sich gültig, und
+  // ein Fehler im einen macht den anderen nicht unbrauchbar.
   return (
-    <script
-      type="application/ld+json"
-      // Die Daten stammen aus der eigenen Datenbank und enthalten keine
-      // Nutzereingaben. JSON.stringify entschärft die Zeichen, die im Skript
-      // gefährlich wären.
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify(daten).replace(/</g, "\\u003c"),
-      }}
-    />
+    <>
+      {[objektDaten, brotkrumen].map((block, index) => (
+        <script
+          key={index}
+          type="application/ld+json"
+          // Die Daten stammen aus der eigenen Datenbank und enthalten keine
+          // Nutzereingaben. Das Ersetzen der spitzen Klammer verhindert, dass
+          // ein Wert das Skript-Element vorzeitig beendet.
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(block).replace(/</g, "\\u003c"),
+          }}
+        />
+      ))}
+    </>
   );
 }

@@ -58,3 +58,23 @@ export type ObjektKarteDaten = Pick<
   | "nettorendite"
   | "preis_pro_m2"
 >;
+
+/** Eine Zeile der Sicht public.orte, für die Auswahl im Umkreisfilter */
+export type Ort = {
+  ort: string;
+  kanton: string;
+  anzahl: number;
+  lat: number;
+  lon: number;
+};
+
+/** Eine Zeile der Funktion public.vergleichsobjekte, mit Distanz in Metern */
+export type Vergleichsobjekt = {
+  slug: string;
+  titel: string;
+  ort: string;
+  distanz_m: number;
+  preis_chf: number;
+  preis_pro_m2: number;
+  bruttorendite: number;
+};
