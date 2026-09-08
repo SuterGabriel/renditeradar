@@ -23,7 +23,7 @@ Eine Tabelle genügt. Kennzahlen sind gespeicherte Spalten, damit nach ihnen gef
 | `preis_pro_m2` | numeric(10,2) | berechnet |
 | `preis_pro_zimmer` | numeric(12,2) | berechnet |
 | `lat`, `lon` | numeric(9,6) | Check-Constraint auf die Schweiz |
-| `geom` | geography(Point,4326) | erst in M5 |
+| `geog` | geography(Point,4326) | erzeugte Spalte aus `lat` und `lon`, ab M5 |
 | `quelle` | text | "generiert-v1" |
 | `erfasst_am` | timestamptz | Datum der Ersterfassung, bleibt beim Upsert |
 
@@ -36,7 +36,7 @@ Eine Tabelle genügt. Kennzahlen sind gespeicherte Spalten, damit nach ihnen gef
 | unique | `slug` | Detailseite |
 | `objekte_kanton_typ_preis_idx` | `(kanton, typ, preis_chf)` | Listenfilter: Gleichheit auf Kanton und Typ, Bereich auf Preis. Gleichheitsspalten zuerst, damit der Index auch bei Filter nur nach Kanton greift |
 | `objekte_bruttorendite_idx` | `(bruttorendite desc)` | Standardsortierung der Liste |
-| GiST auf `geom` | | Umkreissuche, erst in M5 |
+| `objekte_geog_idx` | GiST auf `geog` | Umkreissuche und Suche nach dem nächsten Nachbarn |
 
 ## Zugriff
 
@@ -63,3 +63,17 @@ Der Hash bildet sich aus PLZ, Strasse und Fläche. Die Strasse wird vorher norma
 ## Warum bigint statt UUID
 
 Der Projektplan sah `uuid` vor. Die Postgres-Regeln von Supabase raten davon ab, weil zufällige UUIDs den Index fragmentieren. Die öffentliche Kennung ist ohnehin der Slug, die ID erscheint nirgends in der URL. Deshalb eine fortlaufende Ganzzahl.
+
+## Standort, ab M5
+
+Die Spalte `geog` ist eine erzeugte Spalte, abgeleitet aus `lat` und `lon`. Sie kann deshalb nicht von den Koordinaten abweichen, und die Pipeline muss nichts von ihr wissen. Die Reihenfolge im Punktkonstruktor ist Länge vor Breite.
+
+Dazu kommen eine Sicht und zwei Funktionen, alle mit `security invoker`, damit die Leseberechtigung weiter gilt:
+
+| Objekt | Zweck |
+|---|---|
+| `orte` | Orte mit Objektzahl und mittlerer Koordinate, für die Auswahl im Umkreisfilter |
+| `objekte_im_umkreis(lat, lon, radius_m)` | gibt `setof objekte` zurück, damit die übrigen Filter unverändert darauf greifen |
+| `vergleichsobjekte(slug, anzahl)` | die nächstgelegenen Objekte mit Distanz in Metern |
+
+Der Name `geog` statt `geom` folgt der Regel, Geometry-Spalten `geom` und Geography-Spalten `geog` zu nennen. Der Projektplan sah `geom` vor.

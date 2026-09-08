@@ -29,9 +29,11 @@ Die Pipeline schreibt über eine direkte Postgres-Verbindung als Tabellenbesitze
 | Filter-Chips | Server Component | Jeder Chip ist ein Link auf dieselbe Liste ohne diesen Filter. |
 | Objektkarte, Kennzahlkachel, Seitennavigation | Server Component | Reine Darstellung ohne Zustand. |
 | Detailseite | Server Component, statisch mit ISR | Siehe `docs/entscheide/001-isr-statt-ssr.md`. |
-| Renditerechner | Client Component, die einzige | Rechnet bei jeder Eingabe neu, ohne Server. Ergebnis wird beim Rendern abgeleitet, kein zweiter Zustand. |
+| Renditerechner | Client Component | Rechnet bei jeder Eingabe neu, ohne Server. Ergebnis wird beim Rendern abgeleitet, kein zweiter Zustand. |
+| Vergleichsobjekte | Server Component | Holt die Nachbarn über die Datenbankfunktion mit GiST-Index. Die Liste steht unabhängig von der Karte. |
+| Umgebungskarte | Client Component | Leaflet spricht den DOM an und läuft auf dem Server nicht. Wird ohne serverseitiges Rendern nachgeladen. |
 
-Die Anwendung enthält genau eine Client Component. Das ist Absicht: Interaktion wird über URL und Formular gelöst, wo das genügt, und nur der Rechner braucht Zustand im Browser.
+Die Anwendung enthält zwei Client Components: den Renditerechner und die Karte. Alles andere läuft auf dem Server. Interaktion wird über URL und Formular gelöst, wo das genügt. Die Karte kommt über eine dünne Zwischenschicht, weil das Laden ohne serverseitiges Rendern seit Next.js 15 nur in einer Client Component erlaubt ist.
 
 ## Abweichungen vom Mockup
 
@@ -75,3 +77,11 @@ Dazwischen lag eine falsche Spur: `package-lock.json` war unter Windows schrittw
 **Lösung.** `.github` aus den Textsuchen ausgenommen, `pythonpath` in `pyproject.toml` gesetzt, `next typegen` vor der Typprüfung. Jede Ursache wurde zuerst lokal reproduziert, bevor sie behoben wurde. Die Ursache von Punkt 3 kam aus den Annotationen des Laufs, nicht aus einer Vermutung.
 
 **Warum es zählt.** Eine Prüfung, die nur auf dem eigenen Rechner läuft, prüft auch den Zustand des eigenen Rechners mit. Erst die frische Umgebung zeigt, was das Repo tatsächlich enthält. Deshalb laufen die Regeln der Skills jetzt in `.github/workflows/` bei jedem Push, siehe `docs/offene-punkte.md` unter M2.
+
+## Problem und Lösung: Räumlicher Index nur bei festem Bezugspunkt
+
+**Problem.** Die Suche nach den fünf nächstgelegenen Objekten war naheliegend als Verknüpfung der Tabelle mit sich selbst geschrieben. Der Abfrageplan zeigte einen sequenziellen Durchlauf mit anschliessendem Sortieren, der GiST-Index blieb ungenutzt.
+
+**Lösung.** Der Bezugspunkt steht jetzt als skalare Unterabfrage im Ausdruck statt als Partner einer Verknüpfung. Damit wird er im Plan zu einem InitPlan, also zu einer Konstante, und der Index kann den Distanzoperator bedienen. Der Plan zeigt `Index Scan using objekte_geog_idx`.
+
+**Warum es zählt.** Ein räumlicher Index für die Suche nach dem nächsten Nachbarn setzt voraus, dass eine Seite des Vergleichs feststeht. Wer den Bezugspunkt aus einer Verknüpfung bezieht, bekommt eine Abfrage, die bei kleinen Datenmengen schnell aussieht und mit der Tabelle linear langsamer wird. Der Unterschied ist im Plan sichtbar, nicht an der Laufzeit von 400 Zeilen.

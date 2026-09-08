@@ -10,6 +10,74 @@ Was fehlt, was bewusst weggelassen wurde und was beim Abschluss eines Meilenstei
 
 ## Meilensteine
 
+### M5 Standortsuche, 2026-09-08
+
+Fertig-Kriterium erfüllt. PostGIS 3.3.7, Spalte `geog` als erzeugte Spalte aus `lat` und `lon`, GiST-Index, zwei Datenbankfunktionen und eine Sicht über die Orte.
+
+Umkreis 10 km um Olten, 48 Treffer in sieben Gemeinden, ab 0.3 km. Abfrageplan:
+
+```
+Index Scan using objekte_geog_idx on objekte
+  Index Cond: (geog && _st_expand('...'::geography, '10000'))
+  Filter: st_dwithin(geog, '...'::geography, '10000', true)
+Execution Time: 7.825 ms
+```
+
+Fünf nächstgelegene Vergleichsobjekte, Order By über den Operator, Execution Time 0.155 ms. Beide unter der Vorgabe von 100 ms.
+
+Seite gegen Datenbank, alle Werte gleich:
+
+| Adresse | Seite | Datenbank |
+|---|---|---|
+| 5 km um Olten | 31 | 31 |
+| 10 km um Olten | 48 | 48 |
+| 25 km um Olten | 89 | 89 |
+| 50 km um Olten | 203 | 203 |
+| 25 km, Wohnung, ab 4.5 % | 33 | 33 |
+| unbekannter Ort | 0 | 0 |
+
+Detailseite: Abschnitt mit fünf Vergleichsobjekten, Karte über Leaflet nachgeladen, Seite weiterhin aus dem Cache.
+
+Drei Fehler, die erst die Prüfung gezeigt hat:
+
+1. **Der KNN-Index blieb ungenutzt.** Mit dem Bezugspunkt aus einem Join sah der Planer keine Konstante und wählte einen sequenziellen Durchlauf mit Sortieren. Als skalare Unterabfrage wird daraus ein InitPlan, und der Index greift. 0.63 ms auf 0.16 ms bei 400 Zeilen, entscheidend wird der Unterschied bei mehr Daten.
+2. **Ein unbekannter Slug lieferte fünf Zeilen** mit leerer Distanz, weil die Unterabfrage nichts ergab und die Sortierung nichts zu vergleichen hatte. Jetzt eine Bedingung, die den Bezugspunkt voraussetzt.
+3. **Ein unbekannter Ort lieferte alle 400 Objekte.** Der Filter fiel still weg, während der Chip weiter einen Umkreis nannte. Jetzt null Treffer.
+
+Offen nach M5:
+
+- Die Sicht `orte` mittelt die Koordinaten der Objekte eines Orts. Bei weit verstreuten Objekten ist dieser Mittelpunkt ungenau. Amtliche Ortskoordinaten wären besser.
+- Die Vergleichsobjekte holen ihre Koordinaten in fünf zusätzlichen Abfragen, weil die Datenbankfunktion sie nicht mitliefert. Die Abfragen laufen parallel und sind zwischengespeichert, sauberer wäre eine Rückgabe der Koordinaten aus der Funktion.
+- Die Karte ist nicht per Tastatur vollständig bedienbar. Alle Inhalte stehen zusätzlich als Liste darunter, die Karte ist Beiwerk.
+
+### M4 Deployment und Übergabe, 2026-09-08
+
+Der Teil, der ohne Vercel-Konto möglich ist, ist erledigt. Das Deployment selbst fehlt noch.
+
+README geschrieben, mit Zweck, Datenherkunft, Architektur, Stack, Setup, Entscheiden und Haftungsausschluss.
+
+Skill `seo` und `web-design-guidelines` angewendet, acht Befunde behoben:
+
+| Befund | Behebung |
+|---|---|
+| Listenseite ohne h1, begann mit h2 in den Karten | eigene Überschrift ergänzt |
+| Zahlenfeld im Rechner entfernte den Fokusring ersatzlos | Ring sitzt jetzt am umschliessenden Rahmen |
+| Keine Sprungmarke zum Inhalt | ergänzt, nur bei Fokus sichtbar |
+| Brotkrumen nur sichtbar, nicht maschinenlesbar | zweiter JSON-LD-Block mit BreadcrumbList |
+| Zahlenfelder ohne autocomplete | ergänzt, sonst springt der Passwortmanager an |
+| Doppeltipp-Zoom verzögert Eingaben | touch-action auf manipulation |
+| Überschriften mit Schusterjungen | text-wrap auf balance |
+| Bewegung nicht abschaltbar | reduzierte Bewegung wird beachtet |
+
+Dabei fiel ein weiterer Fehler auf: die Maskierung der spitzen Klammer in den strukturierten Daten war nach einer Umschreibung wirkungslos geworden, weil eine Maskierungsebene verlorenging. Ein einzelner Backslash vor u003c ist in TypeScript das Zeichen selbst, die Ersetzung ersetzte es also durch sich selbst. Behoben und mit einem eigenen Testlauf belegt.
+
+Fünfzehn Prüfungen gegen die gerenderte Seite bestehen, darunter genau eine h1 je Seite, Titel je Seite verschieden, kanonische Adresse, Open Graph, zwei JSON-LD-Blöcke, beschriftete Eingabefelder und Ergebnisse in einer Live-Region.
+
+Offen nach M4:
+
+- **Das Deployment auf Vercel fehlt.** Es braucht den Import des Repositories über das Konto des Betreibers, Root-Verzeichnis `web`, und drei Umgebungsvariablen. Danach: Demo-Adresse ins README, Lighthouse messen, Adresse von einem fremden Gerät prüfen.
+- Lighthouse ist noch nicht gemessen, das setzt die laufende Seite voraus.
+
 ### M3 Renditerechner, 2026-09-08
 
 Fertig-Kriterium erfüllt. Der Rechner ist die erste und einzige Client Component. Die Formel liegt in `web/lib/kennzahlen.ts`, die Komponente enthält nur Eingabe und Anzeige.
