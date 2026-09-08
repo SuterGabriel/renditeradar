@@ -56,7 +56,11 @@ Zwei Fehler, die erst die Tests gezeigt haben:
 2. **Ein geschütztes Leerzeichen sah aus wie ein normales.** Die Formatierung setzt vor `%` und `m²` ein geschütztes Leerzeichen, damit die Einheit nicht umbricht. Der Test erwartete ein normales und schlug mit zwei scheinbar gleichen Werten fehl. Im Test steht das Zeichen jetzt als Escape, damit der Unterschied lesbar ist.
 
 
+Nach M2 ergänzt: drei GitHub-Actions-Workflows unter `.github/workflows/` erzwingen die prüfbaren Regeln der Skills bei jedem Push. `pipeline` prüft ruff und pytest, `web` prüft Prettier, ESLint, Typen, Vitest und den Build, `qualitaet` prüft Secrets in der Historie, eingecheckte `.env`, fremde Inhalte, Portalnamen, Scraping-Code, Rechtschreibung, Lizenz und den Abschnitt je Meilenstein-Tag. Der erste Lauf war in allen drei rot, siehe `docs/architektur.md`.
+
 Offen nach M2:
+
+- Der Build-Schritt im Workflow `web` läuft erst, wenn die Repository-Secrets `NEXT_PUBLIC_SUPABASE_URL` und `NEXT_PUBLIC_SUPABASE_ANON_KEY` gesetzt sind. Bis dahin wird er mit einer Warnung übersprungen.
 
 - Der Renditerechner fehlt, er kommt in M3 als einzige Client Component.
 - Der Typ der Tabelle in `web/lib/typen.ts` ist von Hand geschrieben. `supabase gen types typescript` braucht Docker oder ein persönliches Zugriffstoken, beides ist im Setup nicht vorausgesetzt. Bei einer Schemaänderung muss die Datei mitgeändert werden.

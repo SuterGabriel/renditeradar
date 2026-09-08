@@ -61,3 +61,17 @@ Alle drei sind bewusst und wurden vor dem Bauen entschieden.
 **Lösung.** Die Funktion `baueZiel` in `web/lib/filter.ts` liefert kein Textstück mehr, sondern ein Objekt aus Pfad und Abfrageparametern. Das akzeptiert `next/link` typisiert.
 
 **Warum es zählt.** Der Prüfer hatte recht. Ein zusammengesetzter Text kann jede Adresse enthalten, auch eine falsche. Das Objekt trennt den Pfad von den Parametern und macht Tippfehler im Pfad unmöglich.
+
+## Problem und Lösung: Lokal grün, in der CI rot
+
+**Problem.** Alle Prüfungen liefen lokal ohne Befund. Der erste Lauf auf GitHub Actions scheiterte in allen drei Workflows, jeder aus einem anderen Grund:
+
+1. Der Workflow `qualitaet` fand seine eigenen Suchmuster und meldete einen Portalnamen.
+2. `pytest` ohne `python -m` hatte das Verzeichnis nicht im Suchpfad und fand die Module nicht.
+3. `tsc` fand `PageProps` und `LayoutProps` nicht. Next.js erzeugt diese Typen beim Build, lokal war immer ein Build vorausgegangen.
+
+Dazwischen lag eine falsche Spur: `package-lock.json` war unter Windows schrittweise ergänzt worden und wich von einer frischen Erzeugung ab. Das war ein echter Fehler, aber nicht die Ursache des roten Laufs.
+
+**Lösung.** `.github` aus den Textsuchen ausgenommen, `pythonpath` in `pyproject.toml` gesetzt, `next typegen` vor der Typprüfung. Jede Ursache wurde zuerst lokal reproduziert, bevor sie behoben wurde. Die Ursache von Punkt 3 kam aus den Annotationen des Laufs, nicht aus einer Vermutung.
+
+**Warum es zählt.** Eine Prüfung, die nur auf dem eigenen Rechner läuft, prüft auch den Zustand des eigenen Rechners mit. Erst die frische Umgebung zeigt, was das Repo tatsächlich enthält. Deshalb laufen die Regeln der Skills jetzt in `.github/workflows/` bei jedem Push, siehe `docs/offene-punkte.md` unter M2.
