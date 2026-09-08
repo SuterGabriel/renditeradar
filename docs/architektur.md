@@ -29,9 +29,9 @@ Die Pipeline schreibt über eine direkte Postgres-Verbindung als Tabellenbesitze
 | Filter-Chips | Server Component | Jeder Chip ist ein Link auf dieselbe Liste ohne diesen Filter. |
 | Objektkarte, Kennzahlkachel, Seitennavigation | Server Component | Reine Darstellung ohne Zustand. |
 | Detailseite | Server Component, statisch mit ISR | Siehe `docs/entscheide/001-isr-statt-ssr.md`. |
-| Renditerechner | Client Component | Rechnet mit Annahmen des Nutzers, ohne Datenbank. Kommt in M3. |
+| Renditerechner | Client Component, die einzige | Rechnet bei jeder Eingabe neu, ohne Server. Ergebnis wird beim Rendern abgeleitet, kein zweiter Zustand. |
 
-Bis M3 enthält die Anwendung keine einzige Client Component. Das ist Absicht: Interaktion wird über URL und Formular gelöst, wo das genügt.
+Die Anwendung enthält genau eine Client Component. Das ist Absicht: Interaktion wird über URL und Formular gelöst, wo das genügt, und nur der Rechner braucht Zustand im Browser.
 
 ## Abweichungen vom Mockup
 

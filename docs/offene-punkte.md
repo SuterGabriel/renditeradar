@@ -10,6 +10,36 @@ Was fehlt, was bewusst weggelassen wurde und was beim Abschluss eines Meilenstei
 
 ## Meilensteine
 
+### M3 Renditerechner, 2026-09-08
+
+Fertig-Kriterium erfüllt. Der Rechner ist die erste und einzige Client Component. Die Formel liegt in `web/lib/kennzahlen.ts`, die Komponente enthält nur Eingabe und Anzeige.
+
+Grenzfälle, alle als Test in `web/tests/kennzahlen.test.ts`, 9 Fälle, gesamt 31 Tests grün:
+
+| Grenzfall | Ergebnis |
+|---|---|
+| Eigenkapital 0 % | Eigenkapitalrendite "keine Angabe", übrige Werte bleiben |
+| Eigenkapital 100 % | keine Zinskosten, Eigenkapitalrendite gleich Nettorendite |
+| Leerstand 100 % | Rendite 0, Cashflow gleich minus Zinskosten |
+| Kaufpreis 0 | alle vier Werte "keine Angabe", kein `NaN`, kein Unendlich |
+| Mietertrag 0 | Rendite 0, Cashflow negativ |
+| Eingabe `NaN` | kein Wert ist `NaN` |
+| Leeres Zahlenfeld | wird als 0 gelesen |
+
+Nachweis gegen den Produktionsserver, Objekt mit Kaufpreis CHF 370'000 und Mietertrag CHF 17'040, Vorgabewerte 20 % Eigenkapital, 2.0 % Zins, 25 % Nebenkosten:
+
+```
+Gerendert: 4.6 %, 3.5 %, 9.3 %, +CHF 572
+Erwartet:  4.6 %, 3.5 %, 9.3 %, +CHF 572   (Formel unabhängig in Python nachgerechnet)
+```
+
+Tastatur: jedes Feld hat ein Label, der Regler reagiert auf Pfeiltasten, das Zahlenfeld nimmt genaue Werte. Die Ergebnisse stehen in einer `aria-live`-Region, damit Screenreader neue Werte vorlesen. Cashflow trägt Vorzeichen und Farbe, nie nur Farbe.
+
+Offen nach M3:
+
+- Das Live-Verhalten beim Ziehen des Reglers ist nicht automatisiert geprüft, nur die Startwerte und die Formel. Ein Browser-Test mit Playwright ist bewusst nicht im Repo, siehe Regel gegen Scraping-Werkzeuge.
+- Der Mietertrag ist im Rechner fest, weil er aus den Daten stammt. Ein Feld dafür wäre für Objekte ohne bekannte Miete sinnvoll.
+
 ### M2 Next.js Kern, 2026-09-08
 
 Fertig-Kriterium erfüllt. `next build` erzeugt 400 statische Detailseiten:
