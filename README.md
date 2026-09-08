@@ -107,7 +107,7 @@ Jeder Entscheid nennt die verworfene Alternative und woran sie gescheitert ist.
 - **Zwei Client Components im ganzen Projekt.** Filter, Chips und Blättern laufen über URL und Formular und funktionieren ohne JavaScript. Nur der Renditerechner und die Karte brauchen den Browser.
 - **Statische Detailseiten mit Erneuerung.** Messbar am Antwortkopf, nicht am Gefühl.
 - **Umkreissuche mit PostGIS.** Zehn Kilometer um Olten, 48 Treffer, gemessene 7.8 ms mit räumlichem Index. Der Abfrageplan steht in [docs/offene-punkte.md](docs/offene-punkte.md).
-- **Fehler mit Ursache dokumentiert.** Fünf Problem-Dokumente in [docs/architektur.md](docs/architektur.md), darunter der Fall, in dem alle Prüfungen lokal grün und in der CI rot waren, und der ungenutzte räumliche Index.
+- **Fehler mit Ursache dokumentiert.** Vier Problem-Dokumente in [docs/architektur.md](docs/architektur.md), darunter der Fall, in dem alle Prüfungen lokal grün und in der CI rot waren, und der ungenutzte räumliche Index.
 
 ## Was bewusst fehlt
 
