@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { KennzahlKachel } from "@/components/KennzahlKachel";
+import { Renditerechner } from "@/components/Renditerechner";
 import { holeAlleSlugs, holeObjekt } from "@/lib/abfragen";
 import {
   chf,
@@ -146,6 +147,11 @@ export default async function Detailseite({
           <Eckdatum bezeichnung="Erfasst am" wert={datum(objekt.erfasst_am)} />
         </dl>
       </section>
+
+      <Renditerechner
+        preisChf={objekt.preis_chf}
+        mietertragJahrChf={objekt.mietertrag_jahr_chf}
+      />
 
       <p className="text-xs text-text-sekundaer">
         Die Kennzahlen dienen der Demonstration und sind keine Anlageberatung.
