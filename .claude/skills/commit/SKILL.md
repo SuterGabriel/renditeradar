@@ -14,13 +14,14 @@ Der Commit-Verlauf ist Teil der Arbeitsprobe. Er wird gelesen und soll erzählen
 
 <body, optional>
 
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Co-Authored-By: <Attributionszeile des Modells>
 ```
 
 - Typ: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `style`.
 - Scope, genau einer: `pipeline`, `web`, `db`, `docs`, `skills`, `repo`.
 - `M<n>` ist der Meilenstein, zu dem die Änderung gehört. Damit ist der Fortschritt im Verlauf sichtbar.
 - Betreff auf Deutsch im Infinitiv, höchstens 72 Zeichen, kein Punkt am Ende. Schweizer Rechtschreibung, keine Gedankenstriche.
+- Letzte Zeile: die Attributionszeile des Modells, das den Commit erstellt. Kein fester Modellname, er wechselt.
 - Body, wenn der Betreff nicht reicht: erklärt, warum die Änderung nötig war. Was geändert wurde, steht im Diff.
 
 Beispiel:
